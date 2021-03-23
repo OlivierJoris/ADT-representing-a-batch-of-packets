@@ -33,6 +33,9 @@ int main()
 {
     MAGIC m = MAGICinit(NB_ADDRESSES, ADDRESS_SIZE);
 
+    if(!m)
+        return -1;
+
     unsigned char addresses[NB_ADDRESSES][ADDRESS_SIZE] = 
     {
         {192, 168, 0, 1},

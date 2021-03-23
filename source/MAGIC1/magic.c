@@ -19,8 +19,6 @@ struct MAGIC{
     MAGIC_ELEMENT **elements;
 };
 
-static void MAGICfree(MAGIC m);
-
 static unsigned int hash(const char *address, const int maxSize);
 
 static bool sameAdresses(const char *address1, const char *address2,
@@ -32,6 +30,8 @@ static MAGIC_ELEMENT *MAGICAddPair(const char *address, const int index,
                                    const size_t addrSize);
 
 static int MAGICGetValue(MAGIC m, const char *address);
+
+static void MAGICfree(MAGIC m);
 
 static int MAGICGetValue(MAGIC m, const char *address) 
 {
@@ -112,34 +112,43 @@ static void MAGICSetValue(MAGIC m, const char *address, const int index)
 
 static void MAGICfree(MAGIC m)
 {
-    if(!m)
-        return;
-    
-    if(!m->elements)
+    if(m)
     {
+        if(m->elements)
+        {
+            for(size_t i = 0; i < m->maxSize; ++i)
+            {
+                if(m->elements[i])
+                {  
+                    MAGIC_ELEMENT *current = m->elements[i];
+
+                    MAGIC_ELEMENT *prev;
+
+                    while(current != NULL)
+                    {
+                        prev = current;
+                        current = prev->next;
+
+                        if(prev->address)
+                        {
+                            free(prev->address);
+                            prev->address = NULL;
+                        }
+
+                        free(prev);
+                        prev = NULL;
+                    }
+                }
+            }
+
+            free(m->elements);
+            m->elements = NULL;
+        }
+
         free(m);
         m = NULL;
-        return;
     }
-
-    for(size_t i = 0; i < m->maxSize; ++i)
-    {
-        if(m->elements[i])
-        {   
-            if(m->elements[i]->address)
-            {
-                free(m->elements[i]->address);
-                m->elements[i]->address = NULL;
-            }
-            
-            free(m->elements[i]);
-            m->elements[i] = NULL;
-        }
-    }
-
-    free(m->elements);
-    m->elements = NULL;
-
+     
     return;
 }
 
@@ -156,7 +165,9 @@ static unsigned int hash(const char *address, const int maxSize)
 
 MAGIC MAGICinit(int maxSize, int addrSize)
 {
-    MAGIC m = malloc(sizeof(MAGIC));
+    MAGIC m;
+
+    m = malloc(sizeof(*m));
 
     if(!m)
         return NULL;
