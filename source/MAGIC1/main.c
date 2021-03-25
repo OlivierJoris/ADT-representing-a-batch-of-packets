@@ -52,5 +52,17 @@ int main()
         printIndexes(MAGICindex(m, addresses[i]));
     }
 
+    printf("Reset\n\n");
+
+    MAGICreset(m);
+
+    addresses[0][3] = 4;
+
+    for(size_t i = 0; i < NB_ADDRESSES; ++i)
+    {
+        printAddresses(addresses[i]);
+        printIndexes(MAGICindex(m, addresses[i]));
+    }
+
     return 0;
 }
