@@ -6,7 +6,11 @@
 #define ADDRESS_SIZE 4
 #define NB_ADDRESSES 6
 
-void printAddresses(unsigned char *address)
+static void printAddresses(char *address);
+
+static void printIndexes(int index);
+
+static void printAddresses(char *address)
 {
     printf("Address : ");
 
@@ -20,7 +24,7 @@ void printAddresses(unsigned char *address)
     return;
 }
 
-void printIndexes(int index)
+static void printIndexes(int index)
 {
     printf("Index : %d\n", index);
 
@@ -36,14 +40,14 @@ int main()
     if(!m)
         return -1;
 
-    unsigned char addresses[NB_ADDRESSES][ADDRESS_SIZE] = 
+    char addresses[NB_ADDRESSES][ADDRESS_SIZE] = 
     {
-        {192, 168, 0, 1},
-        {192, 168, 0, 2},
-        {192, 168, 0, 3},
-        {192, 168, 0, 2},
-        {192, 168, 0, 1},
-        {192, 168, 0, 1},
+        {10, 1, 0, 1},
+        {10, 1, 0, 2},
+        {10, 1, 0, 3},
+        {10, 1, 0, 2},
+        {10, 1, 0, 1},
+        {10, 1, 0, 1},
     };
 
     for(size_t i = 0; i < NB_ADDRESSES; ++i)
