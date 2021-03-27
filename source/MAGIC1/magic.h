@@ -17,7 +17,7 @@ typedef struct MAGIC *MAGIC;
 MAGIC MAGICinit(int maxSize, int addrSize);
 
 /*
- * Search for the corresponding index of the address dest in 
+ * Searches for the corresponding index of the address dest in 
  * the structure m. If no index is matching, we match this 
  * address to the next available index in the auxiliary 
  * array.
@@ -25,12 +25,12 @@ MAGIC MAGICinit(int maxSize, int addrSize);
  * @param m the MAGIC structure.
  * @param dest the address for which we are looking for the index.
  * 
- * @return The newly created structure.
+ * @return Index in the auxiliary array.
  */
 int MAGICindex(MAGIC m, char* dest);
 
 /*
- * Reset all the matches between addresses and indexes in the structure
+ * Resets all the matches between addresses and indexes in the structure
  * m.
  * 
  * @param m the MAGIC structure.

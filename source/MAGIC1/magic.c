@@ -15,8 +15,8 @@ struct MAGIC_ELEMENT_t
                             (chaining) */
 };
 
-/* Implementation of the SLOTS_OCCUPIED structure : Link list storing 
-   all the slot that are actually occupied in the hash table */
+/* Implementation of the SLOTS_OCCUPIED structure : Linked list storing 
+   all the slots that are actually occupied in the hash table */
 typedef struct SLOTS_OCCUPIED_t SLOTS_OCCUPIED;
 struct SLOTS_OCCUPIED_t
 {
@@ -31,7 +31,7 @@ struct MAGIC
     SLOTS_OCCUPIED *slots;    /* Pointer to all the 
                                  actually occupied slots of the hash table */
     int maxSize;              /* Size of the hash table */
-    int addrSize;             /* Size of one address stored in the hash table */
+    int addrSize;             /* Size of one address (in bytes) stored in the hash table */
     int nbElements;           /* Current number of elements stored in the hash 
                                  table */
     MAGIC_ELEMENT **elements; /* Hash table storing matches of indexes and 
