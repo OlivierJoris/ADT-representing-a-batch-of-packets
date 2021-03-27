@@ -47,11 +47,40 @@ struct MAGIC
     TSTNode* root;          // Root of the TST
 };
 
-TSTNode* tst_create_node(char digit, Item item);
+/*
+ * Creates a node of a Ternary Search Trie (TST).
+ *
+ * @param digit Digit (explicit character) of the node.
+ * @param item Item stored in the node.
+ *
+ * @return Pointer to the new node.
+ */
+static TSTNode* tst_create_node(char digit, Item item);
 
-Item tst_search(MAGIC m, TSTNode* node, char* addr, size_t index);
+/*
+ * Searches the item (index in auxiliary array) associated
+ * with the given address (addr) inside the TST.
+ *
+ * @param m MAGIC structure.
+ * @param node Current node inside the TST.
+ * @param addr Address for which we want the associated index.
+ * @param addrIndex Current index in the array of addr.
+ *
+ * @return Index in auxiliary array associated to addr. 
+ */
+static Item tst_search(MAGIC m, TSTNode* node, char* addr, size_t addrIndex);
 
-TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex);
+/*
+ * Inserts the address addr inside the TST.
+ *
+ * @param m MAGIC structure.
+ * @param node Current node inside the TST.
+ * @param addr Address that we want to add inside the TST.
+ * @param keyIndex Current index in the array of addr.
+ *
+ * @return Node.
+ */
+static TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex);
 
 MAGIC MAGICinit(int maxSize, int addrSize){
     MAGIC m = malloc(sizeof(*m));
@@ -94,7 +123,7 @@ void MAGICreset(MAGIC m){
  *                                            *
  **********************************************/
 
-TSTNode* tst_create_node(char digit, Item item){
+static TSTNode* tst_create_node(char digit, Item item){
     TSTNode* node = malloc(sizeof(TSTNode));
     if(!node)
         return NULL;
@@ -108,24 +137,25 @@ TSTNode* tst_create_node(char digit, Item item){
     return node;
 }
 
-Item tst_search(MAGIC m, TSTNode* node, char* addr, size_t index){
+static Item tst_search(MAGIC m, TSTNode* node, char* addr, size_t addrIndex){
     if(!m)
         return -1;
 
-    if(node->digit == NULLDigit && index >= (size_t)m->addrSize)
+    if(node->digit == NULLDigit && addrIndex >= (size_t)m->addrSize)
         return node->item;
-    if(index >= (size_t)m->addrSize)
+    if(addrIndex >= (size_t)m->addrSize)
         return -1;
 
-    if(addr[index] < node->digit)
-        return tst_search(m, node->left, addr, index);
-    if(addr[index] == node->digit)
-        return tst_search(m, node->middle, addr, index + 1);
-    if(addr[index] > node->digit)
-        return tst_search(m, node->right, addr, index);
+    if(addr[addrIndex] < node->digit)
+        return tst_search(m, node->left, addr, addrIndex);
+    else
+        if(addr[addrIndex] == node->digit)
+            return tst_search(m, node->middle, addr, addrIndex + 1);
+        else
+            return tst_search(m, node->right, addr, addrIndex);
 }
 
-TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex){
+static TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex){
     if(!m)
         return NULL;
 
