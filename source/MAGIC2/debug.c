@@ -33,11 +33,11 @@ struct TSTNode_t{
  * Linked list storing all the nodes inside the TST
  * that contain an Item (index in auxiliary array).
 */
-typedef struct SLOTS_OCCUPIED_t SLOTS_OCCUPIED;
-struct SLOTS_OCCUPIED_t
+typedef struct OCCUPIED_NODE_t OCCUPIED_NODE;
+struct OCCUPIED_NODE_t
 {
     TSTNode* node;        // Node that contains an Item
-    SLOTS_OCCUPIED *next; // Pointer to the next element of the list
+    OCCUPIED_NODE *next; // Pointer to the next element of the list
 };
 
 /* MAGIC structure : Ternary Search Tries (TST)
@@ -46,11 +46,12 @@ struct SLOTS_OCCUPIED_t
  */
 struct MAGIC
 {
-    SLOTS_OCCUPIED *slots;  // Pointer to all the nodes in the TST that contain an Item
-    int maxSize;            // Maximum number of addresses
-    int addrSize;           // Size of one address (in bytes)
-    int nbElements;         // Current number of addresses being stored
-    TSTNode* root;          // Root of the TST
+    OCCUPIED_NODE* occupied_beg;   // Beginning of list all the nodes in the TST that contain an Item
+    OCCUPIED_NODE* occupied_end;   // End of list all the nodes in the TST that contain an Item
+    int maxSize;                    // Maximum number of addresses
+    int addrSize;                   // Size of one address (in bytes)
+    int nbElements;                 // Current number of addresses being stored
+    TSTNode* root;                  // Root of the TST
 };
 
 /*
@@ -88,12 +89,21 @@ static Item tst_search(MAGIC m, TSTNode* node, char* addr, size_t addrIndex);
  */
 static TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex);
 
+/*
+ * Adds a node to the list of occupied nodes inside the TST.
+ *
+ * @param m MAGIC structure.
+ * @param node Node to add in the list of occupied nodes.
+ */
+static void occupied_add_node(MAGIC m, TSTNode* node);
+
 MAGIC MAGICinit(int maxSize, int addrSize){
     MAGIC m = malloc(sizeof(*m));
     if(!m)
         return NULL;
     
-    m->slots = NULL;
+    m->occupied_beg = NULL;
+    m->occupied_end = NULL;
     m->maxSize = maxSize;
     m->addrSize = addrSize;
     m->nbElements = 0;
@@ -106,11 +116,13 @@ int MAGICindex(MAGIC m, char* dest){
     if(!m || !dest)
         return -1;
 
+    // First, we check if the address is already in the TST
     Item item = tst_search(m, m->root, dest, 0);
     if(item >= 0)
         return item;
     else{
-       TSTNode* n = tst_insert(m, m->root, dest, 0);
+        // If not, we add the address inside the TST
+        TSTNode* n = tst_insert(m, m->root, dest, 0);
         if(n == NULL){
             fprintf(stderr, "Error while inserting\n");
             return -1;
@@ -121,6 +133,51 @@ int MAGICindex(MAGIC m, char* dest){
 }
 
 void MAGICreset(MAGIC m){
+    if(!m || !m->occupied_beg)
+        return;
+
+    // Goes through the entire list, updates the item field,
+    // and frees the memory
+    OCCUPIED_NODE* s = m->occupied_beg;
+    OCCUPIED_NODE* tmp = m->occupied_beg;
+    while(s){
+        if(s->node)
+            s->node->item = -1;
+        tmp = s->next;
+        free(s);
+        s = tmp;
+    }
+    m->occupied_beg = NULL;
+    m->occupied_end = NULL;
+
+    // Resets the number of items in the TST
+    m->nbElements = 0;
+
+    return;
+}
+
+static void occupied_add_node(MAGIC m, TSTNode* node){
+    if(!m || !node)
+        return;
+    
+    // If the list is empty
+    if(!m->occupied_beg){
+        m->occupied_beg = malloc(sizeof(OCCUPIED_NODE));
+        if(!m->occupied_beg)
+            return;
+        m->occupied_end = m->occupied_beg;
+        m->occupied_beg->node = node;
+        m->occupied_beg->next = NULL;
+    }else{
+        // The list already contains some nodes
+        m->occupied_end->next = malloc(sizeof(OCCUPIED_NODE));
+        if(!m->occupied_end->next)
+            return;
+        m->occupied_end = m->occupied_end->next;
+        m->occupied_end->node = node;
+        m->occupied_end->next = NULL;
+    }
+
     return;
 }
 
@@ -148,7 +205,7 @@ static Item tst_search(MAGIC m, TSTNode* node, char* addr, size_t addrIndex){
     if(!m || !node)
         return -1;
 
-    if(node->digit == NULLDigit && addrIndex >= (size_t)m->addrSize)
+    if(node->digit == NULLDigit && addrIndex >= (size_t)m->addrSize && node->item != -1)
         return node->item;
     if(addrIndex >= (size_t)m->addrSize)
         return -1;
@@ -168,16 +225,27 @@ static TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex){
 
     fprintf(stderr, "keyIndex = %lu || ", keyIndex);
 
+    /*
+     * If the node was already allocated by another batch,
+     * we just update the item field
+     */
+    if(node && node->digit == NULLDigit && keyIndex == (size_t)m->addrSize){
+        node->item = m->nbElements;
+        occupied_add_node(m, node);
+        m->nbElements++;
+        return node;
+    }
+
     if(node == NULL){
         if(keyIndex >= (size_t)m->addrSize){
             fprintf(stderr, "keyIndex >= (size_t)m->addrSize || m->nbElements = %d\n", m->nbElements);
             node = tst_create_node(NULLDigit, m->nbElements);
-            // TBA: Add node to SLOTS_OCCUPIED
+            occupied_add_node(m, node);
             m->nbElements++;
             return node;
         }else{
             fprintf(stderr, "else keyIndex >= (size_t)m->addrSize || addr[keyIndex] : %d || ", addr[keyIndex]);
-            node = tst_create_node(addr[keyIndex], 0);
+            node = tst_create_node(addr[keyIndex], -1);
         }       
     }
     
