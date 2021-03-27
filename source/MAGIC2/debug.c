@@ -1,3 +1,9 @@
+/**********************************************************
+ * 
+ * TEMPORARY -- debug file -- should NOT be submited
+ *
+ **********************************************************/
+
 #include "magic.h"
 
 #include <stdio.h>
@@ -160,22 +166,33 @@ static TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex){
     if(!m)
         return NULL;
 
+    fprintf(stderr, "keyIndex = %lu || ", keyIndex);
+
     if(node == NULL){
         if(keyIndex >= (size_t)m->addrSize){
+            fprintf(stderr, "keyIndex >= (size_t)m->addrSize || m->nbElements = %d\n", m->nbElements);
             node = tst_create_node(NULLDigit, m->nbElements);
             // TBA: Add node to SLOTS_OCCUPIED
             m->nbElements++;
             return node;
-        }else
+        }else{
+            fprintf(stderr, "else keyIndex >= (size_t)m->addrSize || addr[keyIndex] : %d || ", addr[keyIndex]);
             node = tst_create_node(addr[keyIndex], 0);
+        }       
     }
     
-    if(addr[keyIndex] < node->digit)
+    if(addr[keyIndex] < node->digit){
+        fprintf(stderr, "%d < %d\n", addr[keyIndex], node->digit);
         node->left = tst_insert(m, node->left, addr, keyIndex);
-    if(addr[keyIndex] == node->digit)
+    }
+    if(addr[keyIndex] == node->digit){
+        fprintf(stderr, "%d == %d\n", addr[keyIndex], node->digit);
         node->middle = tst_insert(m, node->middle, addr, keyIndex+1);
-    if(addr[keyIndex] > node->digit)
+    }
+    if(addr[keyIndex] > node->digit){
+        fprintf(stderr, "%d > %d\n", addr[keyIndex], node->digit);
         node->right = tst_insert(m, node->right, addr, keyIndex);
+    }
 
     return node;
 }
