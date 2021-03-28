@@ -62,8 +62,8 @@ static unsigned long hash(const char *address, const int maxSize);
  * @return True if the addresses are equal.
  *         False otherwise.
  */
-static bool sameAdresses(const char *address1, const char *address2,
-                         const size_t addrSize);
+static bool same_adresses(const char *address1, const char *address2,
+                          const size_t addrSize);
 
 /*
  * Sets a couple address/index in the m structure.
@@ -72,7 +72,7 @@ static bool sameAdresses(const char *address1, const char *address2,
  * @param address The address.
  * @param index The index.
  */
-static void MAGICSetValue(MAGIC m, const char *address, const int index);
+static void ht_set_value(MAGIC m, const char *address, const int index);
 
 /*
  * Creates a pointer to MAGIC_ELEMENT with a given address and index.
@@ -83,8 +83,8 @@ static void MAGICSetValue(MAGIC m, const char *address, const int index);
  * 
  * @return A pointer to the newly created element.
  */
-static MAGIC_ELEMENT *MAGICAddPair(const char *address, const int index, 
-                                   MAGIC m);
+static MAGIC_ELEMENT *ht_add_pair(const char *address, const int index, 
+                                  MAGIC m);
 
 /*
  * Gets the index of a given address. If no match, add this address with the
@@ -95,7 +95,7 @@ static MAGIC_ELEMENT *MAGICAddPair(const char *address, const int index,
  * 
  * @return The index matching the given address.
  */
-static int MAGICGetValue(MAGIC m, const char *address);
+static int ht_get_value(MAGIC m, const char *address);
 
 /*
  * Appends to the list storing the occupied slot a new given one.
@@ -103,14 +103,14 @@ static int MAGICGetValue(MAGIC m, const char *address);
  * @param m The magic structure
  * @param slot The slot.
  */
-static void MAGICAppendOccupiedSlot(MAGIC m, const unsigned long slot);
+static void ht_append_occupied_slot(MAGIC m, const unsigned long slot);
 
 /*
  * Frees the memory allocated by the structure m.
  * 
  * @param m The magic structure
  */
-static void MAGICfree(MAGIC m);
+static void ht_free(MAGIC m);
 
 static unsigned long hash(const char *address, const int maxSize)
 {
@@ -126,8 +126,8 @@ static unsigned long hash(const char *address, const int maxSize)
     return hash % maxSize;
 }
 
-static bool sameAdresses(const char *address1, const char *address2, 
-                         const size_t addrSize)
+static bool same_adresses(const char *address1, const char *address2, 
+                          const size_t addrSize)
 {
     if(!address1 || !address2)
         return false;
@@ -141,10 +141,10 @@ static bool sameAdresses(const char *address1, const char *address2,
     return true;
 }
 
-static void MAGICSetValue(MAGIC m, const char *address, const int index) 
+static void ht_set_value(MAGIC m, const char *address, const int index) 
 {
     if(!m || !address){
-        fprintf(stderr, "MAGICSetValue: invalid parameters!\n");
+        fprintf(stderr, "ht_set_value: invalid parameters!\n");
         exit(1);
     }
 
@@ -154,13 +154,13 @@ static void MAGICSetValue(MAGIC m, const char *address, const int index)
 
     if(current == NULL) 
     {
-        m->elements[i] = MAGICAddPair(address, index, m);
+        m->elements[i] = ht_add_pair(address, index, m);
         if(!m->elements[i]){
-            fprintf(stderr, "MAGICSetValue: memory allocation issue!\n");
-            MAGICfree(m);
+            fprintf(stderr, "ht_set_value: memory allocation issue!\n");
+            ht_free(m);
             exit(1);
         }
-        MAGICAppendOccupiedSlot(m, i);
+        ht_append_occupied_slot(m, i);
         return;
     }
 
@@ -173,17 +173,17 @@ static void MAGICSetValue(MAGIC m, const char *address, const int index)
     }
 
     // End of the list
-    prev->next = MAGICAddPair(address, index, m);
+    prev->next = ht_add_pair(address, index, m);
     if(!prev->next){
-        fprintf(stderr, "MAGICSetValue: memory allocation issue!\n");
-        MAGICfree(m);
+        fprintf(stderr, "ht_set_value: memory allocation issue!\n");
+        ht_free(m);
         exit(1);
     }
 
     return;
 }
 
-static MAGIC_ELEMENT *MAGICAddPair(const char *address, const int index, 
+static MAGIC_ELEMENT *ht_add_pair(const char *address, const int index, 
                                    MAGIC m)
 {
     if(!m || !address)
@@ -210,7 +210,7 @@ static MAGIC_ELEMENT *MAGICAddPair(const char *address, const int index,
     return me;
 }
 
-static int MAGICGetValue(MAGIC m, const char *address) 
+static int ht_get_value(MAGIC m, const char *address) 
 {
     if(!m || !address){
         fprintf(stderr, "MAGICGetValue: invalid parameters!\n");
@@ -223,18 +223,18 @@ static int MAGICGetValue(MAGIC m, const char *address)
 
     while(current) 
     { 
-        if(sameAdresses(current->address, address, m->addrSize))
+        if(same_adresses(current->address, address, m->addrSize))
             return current->index;
 
         current = current->next;
     }
 
-    MAGICSetValue(m, address, m->nbElements);
+    ht_set_value(m, address, m->nbElements);
 
     return m->nbElements - 1;
 }
 
-static void MAGICAppendOccupiedSlot(MAGIC m, const unsigned long slot)
+static void ht_append_occupied_slot(MAGIC m, const unsigned long slot)
 {
     if(!m)
         return;
@@ -251,7 +251,7 @@ static void MAGICAppendOccupiedSlot(MAGIC m, const unsigned long slot)
     return;
 }
 
-void MAGICfree(MAGIC m)
+void ht_free(MAGIC m)
 {
     if(m)
     {
@@ -316,7 +316,7 @@ MAGIC MAGICinit(int maxSize, int addrSize)
     
     if(maxSize <= 0 || addrSize <= 0)
     {
-        MAGICfree(m);
+        ht_free(m);
         return NULL;
     }
 
@@ -328,7 +328,7 @@ MAGIC MAGICinit(int maxSize, int addrSize)
     m->elements = malloc(sizeof(MAGIC_ELEMENT *) * maxSize);
     if(!m->elements)
     {
-        MAGICfree(m);
+        ht_free(m);
         return NULL;
     }
 
@@ -344,7 +344,7 @@ int MAGICindex(MAGIC m, char *dest)
         fprintf(stderr, "MAGICindex: invalid parameters!\n");
         exit(1);
     }
-    return MAGICGetValue(m, dest);
+    return ht_get_value(m, dest);
 }
 
 void MAGICreset(MAGIC m)
