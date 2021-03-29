@@ -86,7 +86,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Performance study}
-\paragraph{}We decided to perform our perfomance study by doing 1000 differents creation of the \texttt{MAGIC} A.D.T. and by measuring the mean time passed in the \texttt{MAGICindex} and \texttt{MAGICreset} A.D.T. functions. We chose to deal with an increasing number of addresses to be able to analyse the differences between the implementation on graphics. The addresses we used to measure the perfomance of these functions were randomly generated 4 bytes addresses.
+\paragraph{}We decided to perform our perfomance study by doing 1000 different creations of the \texttt{MAGIC} A.D.T. and by measuring the mean time passed in the \texttt{MAGICindex} and \texttt{MAGICreset} functions. We chose to deal with an increasing number of addresses in order to be able to analyse the differences between the implementations on graphics. The addresses we used to measure the perfomances of these functions were randomly generated 4 bytes addresses.
 \subsection{First implementation : Hash table}
 \paragraph{}We resumed the total time passed in the A.D.T. functions on the graphic represented on the \autoref{fig:ht}. 
 \begin{figure}[H]
@@ -99,14 +99,14 @@
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.6]{plots/ht_index.png} 
-  \caption{Mean time passed in the \texttt{MAGICindex} over 1000 tests according to the number of addresses stored in the structure.}\label{fig:ht_index}
+  \caption{Mean time passed in the \texttt{MAGICindex} function over 1000 tests according to the number of addresses stored in the structure.}\label{fig:ht_index}
 \end{figure}
 \subsubsection{Time passed in the MAGICreset function}
 \paragraph{}We resumed the time passed in the \texttt{MAGICreset} function on the graphic represented on the \autoref{fig:ht_reset}. 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.6]{plots/ht_reset.png} 
-  \caption{Mean time passed in the \texttt{MAGICreset} over 1000 tests according to the number of addresses stored in the structure.}\label{fig:ht_reset}
+  \caption{Mean time passed in the \texttt{MAGICreset} function over 1000 tests according to the number of addresses stored in the structure.}\label{fig:ht_reset}
 \end{figure}
 
 \subsection{Second implementation : Ternary search trie}
@@ -121,14 +121,14 @@
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.6]{plots/tst_index.png} 
-  \caption{Mean time passed in the \texttt{MAGICindex} over 1000 tests according to the number of addresses stored in the structure.}\label{fig:tst_index}
+  \caption{Mean time passed in the \texttt{MAGICindex} function over 1000 tests according to the number of addresses stored in the structure.}\label{fig:tst_index}
 \end{figure}
 \subsubsection{Time passed in the MAGICreset function}
 \paragraph{}We resumed the time passed in the \texttt{MAGICreset} function on the graphic represented on the \autoref{fig:tst_reset}. 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.6]{plots/tst_reset.png} 
-  \caption{Mean time passed in the \texttt{MAGICreset} over 1000 tests according to the number of addresses stored in the structure.}\label{fig:tst_reset}
+  \caption{Mean time passed in the \texttt{MAGICreset} function over 1000 tests according to the number of addresses stored in the structure.}\label{fig:tst_reset}
 \end{figure}
 
 \subsection{Conclusion}
