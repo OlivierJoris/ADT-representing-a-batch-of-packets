@@ -6,12 +6,12 @@
 #include <stdio.h>
 
 #define ADDRESS_SIZE 4
-#define NB_ADDRESSES_MAX 90000
-#define NB_TESTS 100
+#define NB_ADDRESSES_MAX 10000
+#define NB_TESTS 1000
 
 int main()
 {
-    srand(time(NULL));
+    srand(817);
 
     double meanIndex, meanReset = 0;
 
@@ -23,7 +23,7 @@ int main()
 	if(reset == NULL)
 		return -1;
 
-    for(unsigned int nbAdresses = 0; nbAdresses < NB_ADDRESSES_MAX; nbAdresses += 3000)
+    for(unsigned int nbAdresses = 0; nbAdresses < NB_ADDRESSES_MAX; nbAdresses += 500)
     {
         MAGIC m = MAGICinit(NB_ADDRESSES_MAX, ADDRESS_SIZE);
 
@@ -41,7 +41,9 @@ int main()
             for(size_t j = 0; j < nbAdresses; ++j)
             {
                 for(size_t i = 0; i < ADDRESS_SIZE; ++i)
+                {
                     addresses[j][i] = rand() % 127; 
+                }
             }
 
             clock_t t1 = clock();
@@ -79,6 +81,9 @@ int main()
 
         free(addresses);
     }
+
+    fprintf(index, "\n");
+    fprintf(reset, "\n");
 
     fclose(index);
 
