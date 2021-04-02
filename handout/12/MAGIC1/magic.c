@@ -126,11 +126,14 @@ static unsigned long hash(const char *address, const int maxSize){
         return 0;
 
     unsigned long hash = 5381;
+    int i = 0;
     char c;
 
-    while((c = *address++))
+    while(i < maxSize){
+        c = address[i];
         hash = ((hash << 5) + hash) + c;
-
+        i++;
+    }
     return hash % maxSize;
 }
 
