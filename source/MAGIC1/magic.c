@@ -1,11 +1,19 @@
+/*
+ * Module implementing the magic interface using a hash table.
+ * 
+ * @author Maxime Goffart (180521) & Olivier Joris (182113)
+ */
+
 #include "magic.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 
-/* Implementation of the MAGIC_ELEMENT structure : one element of 
-   the hash table */
+/* 
+ * Implementation of the MAGIC_ELEMENT structure: one element of 
+ * the hash table.
+ */
 typedef struct MAGIC_ELEMENT_t MAGIC_ELEMENT;
 struct MAGIC_ELEMENT_t
 {
@@ -15,8 +23,10 @@ struct MAGIC_ELEMENT_t
                             (chaining) */
 };
 
-/* Implementation of the SLOTS_OCCUPIED structure : Linked list storing 
-   all the slots that are actually occupied in the hash table */
+/*
+ * Implementation of the SLOTS_OCCUPIED structure: Linked list storing 
+ * all the slots that are actually occupied in the hash table.
+ */
 typedef struct SLOTS_OCCUPIED_t SLOTS_OCCUPIED;
 struct SLOTS_OCCUPIED_t
 {
@@ -24,8 +34,10 @@ struct SLOTS_OCCUPIED_t
     SLOTS_OCCUPIED *next; /* Pointer to the next element of the list */
 };
 
-/* Implementation of the MAGIC structure : Hash table matching 
-   addresses and indexes of the auxiliary array */
+/*
+ * Implementation of the MAGIC structure: Hash table matching 
+ * addresses and indexes of the auxiliary array.
+ */
 struct MAGIC
 {
     SLOTS_OCCUPIED *slots;    /* Pointer to all the 
@@ -87,7 +99,7 @@ static MAGIC_ELEMENT *ht_add_pair(const char *address, const int index,
                                   MAGIC m);
 
 /*
- * Gets the index of a given address. If no match, add this address with the
+ * Gets the index of a given address. If no match, adds this address with the
  * next available element.
  * 
  * @param m The magic structure
@@ -148,22 +160,24 @@ static void ht_set_value(MAGIC m, const char *address, const int index)
         exit(1);
     }
 
-    unsigned long i = hash(address, m->maxSize);
+    unsigned long hashValue = hash(address, m->maxSize);
 
-    MAGIC_ELEMENT *current = m->elements[i];
+    MAGIC_ELEMENT *current = m->elements[hashValue];
 
-    if(current == NULL) 
+    // If element not already set in the hash table
+    if(!current) 
     {
-        m->elements[i] = ht_add_pair(address, index, m);
-        if(!m->elements[i]){
+        m->elements[hashValue] = ht_add_pair(address, index, m);
+        if(!m->elements[hashValue]){
             fprintf(stderr, "ht_set_value: memory allocation issue!\n");
             ht_free(m);
             exit(1);
         }
-        ht_append_occupied_slot(m, i);
+        ht_append_occupied_slot(m, hashValue);
         return;
     }
 
+    // If collision, chaining
     MAGIC_ELEMENT *prev;
 
     while(current) 
@@ -217,11 +231,11 @@ static int ht_get_value(MAGIC m, const char *address)
         exit(1);
     }
 
-    unsigned long i = hash(address, m->maxSize);
+    unsigned long hashValue = hash(address, m->maxSize);
 
-    MAGIC_ELEMENT *current = m->elements[i];
+    MAGIC_ELEMENT *current = m->elements[hashValue];
 
-    while(current) 
+    while(current)
     { 
         if(same_adresses(current->address, address, m->addrSize))
             return current->index;

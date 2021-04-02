@@ -1,9 +1,15 @@
+/*
+ * Module implementing the magic interface using a TST.
+ * 
+ * @author Maxime Goffart (180521) & Olivier Joris (182113)
+ */
+
 #include "magic.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-// End of a key.
+// End of a key (address).
 #define NULLDigit '\0'
 
 /* 
@@ -28,24 +34,25 @@ struct TSTNode_t{
  * that contain an Item (index in auxiliary array).
 */
 typedef struct OCCUPIED_NODE_t OCCUPIED_NODE;
-struct OCCUPIED_NODE_t
-{
+struct OCCUPIED_NODE_t{
     TSTNode* node;        // Node that contains an Item
-    OCCUPIED_NODE *next; // Pointer to the next element of the list
+    OCCUPIED_NODE *next;  // Pointer to the next element of the list
 };
 
-/* MAGIC structure : Ternary Search Tries (TST)
+/*
+ * MAGIC structure: Ternary Search Trie (TST)
  * that contains the mapping between the addresses
  * and the index in the auxiliary array.
  */
-struct MAGIC
-{
-    OCCUPIED_NODE* occupied_beg;   // Beginning of list all the nodes in the TST that contain an Item
-    OCCUPIED_NODE* occupied_end;   // End of list all the nodes in the TST that contain an Item
-    int maxSize;                    // Maximum number of addresses
-    int addrSize;                   // Size of one address (in bytes)
-    int nbElements;                 // Current number of addresses being stored
-    TSTNode* root;                  // Root of the TST
+struct MAGIC{
+    // Beginning of list of all the nodes in the TST that contain an Item
+    OCCUPIED_NODE* occupied_beg;
+    // End of list of all the nodes in the TST that contain an Item
+    OCCUPIED_NODE* occupied_end;
+    int maxSize;    // Maximum number of addresses
+    int addrSize;   // Size of one address (in bytes)
+    int nbElements; // Current number of addresses being stored
+    TSTNode* root;  // Root of the TST
 };
 
 /*
@@ -199,8 +206,10 @@ static Item tst_search(MAGIC m, TSTNode* node, char* addr, size_t addrIndex){
     if(!m || !node)
         return -1;
 
+    // Search hit
     if(node->digit == NULLDigit && addrIndex >= (size_t)m->addrSize && node->item != -1)
         return node->item;
+    // Search miss
     if(addrIndex >= (size_t)m->addrSize)
         return -1;
 
@@ -229,12 +238,13 @@ static TSTNode* tst_insert(MAGIC m, TSTNode* node, char* addr, size_t keyIndex){
     }
 
     if(node == NULL){
-        if(keyIndex >= (size_t)m->addrSize){ // need to create the node
+        // End of key => add matching
+        if(keyIndex >= (size_t)m->addrSize){
             node = tst_create_node(NULLDigit, m->nbElements);
             occupied_add_node(m, node);
             m->nbElements++;
             return node;
-        }else
+        }else // Not end of key => add node which does not represent a matching
             node = tst_create_node(addr[keyIndex], -1);
     }
     
