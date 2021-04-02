@@ -56,10 +56,12 @@ struct MAGIC{
  * 
  * @param address Address to hash (key).
  * @param maxSize Size of the hash table.
+ * @param addrSize Size of the address.
  * 
  * @return The hash of the given address.
  */
-static unsigned long hash(const char *address, const int maxSize);
+static unsigned long hash(const char *address, const int maxSize,
+                            const int addrSize);
 
 /*
  * Checks if two addresses are equals.
@@ -121,7 +123,8 @@ static void ht_append_occupied_slot(MAGIC m, const unsigned long slot);
  */
 static void ht_free(MAGIC m);
 
-static unsigned long hash(const char *address, const int maxSize){
+static unsigned long hash(const char *address, const int maxSize,
+    const int addrSize){
     if(!address)
         return 0;
 
@@ -129,7 +132,7 @@ static unsigned long hash(const char *address, const int maxSize){
     int i = 0;
     char c;
 
-    while(i < maxSize){
+    while(i < addrSize){
         c = address[i];
         hash = ((hash << 5) + hash) + c;
         i++;
@@ -156,7 +159,7 @@ static void ht_set_value(MAGIC m, const char *address, const int index){
         exit(1);
     }
 
-    unsigned long hashValue = hash(address, m->maxSize);
+    unsigned long hashValue = hash(address, m->maxSize, m->addrSize);
 
     MAGIC_ELEMENT *current = m->elements[hashValue];
 
@@ -223,7 +226,7 @@ static int ht_get_value(MAGIC m, const char *address){
         exit(1);
     }
 
-    unsigned long hashValue = hash(address, m->maxSize);
+    unsigned long hashValue = hash(address, m->maxSize, m->addrSize);
 
     MAGIC_ELEMENT *current = m->elements[hashValue];
 
