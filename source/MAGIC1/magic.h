@@ -1,8 +1,16 @@
+/*
+ * MAGIC interface.
+ * 
+ * @author Maxime Goffart (180521) & Olivier Joris (182113)
+ */
+
 #ifndef __MAGIC__
 #define __MAGIC__
 
-/* ADT that manages the matching between adresses and indexes
-   of the auxiliary array (opaque type) */
+/*
+ * ADT that manages the matching between adresses and indexes 
+ * of the auxiliary array
+ */
 typedef struct MAGIC *MAGIC;
 
 /*
@@ -18,12 +26,12 @@ MAGIC MAGICinit(int maxSize, int addrSize);
 
 /*
  * Searches for the corresponding index of the address dest in 
- * the structure m. If no index is matching, we match this 
+ * the structure m. If no index is matching, we matches this 
  * address to the next available index in the auxiliary 
  * array.
  * 
- * @param m the MAGIC structure.
- * @param dest the address for which we are looking for the index.
+ * @param m The MAGIC structure.
+ * @param dest Address for which we are looking for the index.
  * 
  * @return Index in the auxiliary array.
  */
@@ -33,7 +41,7 @@ int MAGICindex(MAGIC m, char* dest);
  * Resets all the matches between addresses and indexes in the structure
  * m.
  * 
- * @param m the MAGIC structure.
+ * @param m The MAGIC structure.
  */
 void MAGICreset(MAGIC m);
 
